@@ -137,8 +137,13 @@ export const Observable = Object.freeze({
      * @param target - The target object to define the observable on.
      * @param nameOrAccessor - The name of the property to define as observable;
      * or a custom accessor that specifies the property name and accessor implementation.
+     * @param descriptor - The property descriptor for the target
      */
-    defineProperty(target: {}, nameOrAccessor: string | Accessor): void {
+    defineProperty(
+        target: {},
+        nameOrAccessor: string | Accessor,
+        descriptor?: PropertyDescriptor
+    ): void {
         if (typeof nameOrAccessor === "string") {
             nameOrAccessor = new DefaultObservableAccessor(nameOrAccessor);
         }
@@ -147,13 +152,17 @@ export const Observable = Object.freeze({
 
         Reflect.defineProperty(target, nameOrAccessor.name, {
             enumerable: true,
-            get: function (this: any) {
+            get: function () {
                 return (nameOrAccessor as Accessor).getValue(this);
             },
-            set: function (this: any, newValue: any) {
+            set: function (newValue: any) {
                 (nameOrAccessor as Accessor).setValue(this, newValue);
             },
         });
+
+        if ((descriptor as any)?.initializer) {
+            target[nameOrAccessor.name] = (descriptor as any).initializer();
+        }
     },
 
     /**
@@ -223,11 +232,16 @@ const queueUpdate = DOM.queueUpdate;
 /**
  * Decorator: Defines an observable property on the target.
  * @param target - The target to define the observable on.
- * @param nameOrAccessor - The property name or accessor to define the observable as.
+ * @param name - The property name to define the observable as.
+ * @param descriptor - The property descriptor for the target
  * @public
  */
-export function observable(target: {}, nameOrAccessor: string | Accessor): void {
-    Observable.defineProperty(target, nameOrAccessor);
+export function observable(
+    target: {},
+    name: string,
+    descriptor?: PropertyDescriptor
+): void {
+    Observable.defineProperty(target, name, descriptor);
 }
 
 /**

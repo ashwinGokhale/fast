@@ -392,14 +392,14 @@ export const Observable: Readonly<{
     track(source: unknown, propertyName: string): void;
     trackVolatile(): void;
     notify(source: unknown, args: any): void;
-    defineProperty(target: {}, nameOrAccessor: string | Accessor): void;
+    defineProperty(target: {}, nameOrAccessor: string | Accessor, descriptor?: PropertyDescriptor | undefined): void;
     getAccessors(target: {}): Accessor[];
     binding<TSource = any, TReturn = any, TParent = any>(binding: Binding<TSource, TReturn, TParent>, initialSubscriber?: Subscriber | undefined, isVolatileBinding?: boolean): BindingObserver<TSource, TReturn, TParent>;
     isVolatileBinding<TSource_1 = any, TReturn_1 = any, TParent_1 = any>(binding: Binding<TSource_1, TReturn_1, TParent_1>): boolean;
 }>;
 
 // @public
-export function observable(target: {}, nameOrAccessor: string | Accessor): void;
+export function observable(target: {}, name: string, descriptor?: PropertyDescriptor): void;
 
 // @public
 export interface ObservationRecord {
